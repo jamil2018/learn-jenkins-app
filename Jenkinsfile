@@ -32,7 +32,7 @@ pipeline {
                     test -f build/index.html
                     npm test  
                     npx serve -s build &
-                    npx playwright test
+                    npx playwright test --reporter=html
                 '''
             }
         }
