@@ -23,14 +23,14 @@ pipeline {
         stage('Test'){
             agent{
                 docker{
-                    image 'mcr.microsoft.com/playwright:v1.49.1-noble'
+                    image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
                     reuseNode true
                 }
             }
             steps{
                 sh '''
                     test -f build/index.html    
-                    npx --yes concurrently "npx serve -s build" "npx playwright test"
+                    npx --yes concurrently "npx serve -s build &" "npx playwright test"
                 '''
             }
         }
@@ -38,7 +38,7 @@ pipeline {
 
     post{
         always{
-            junit 'test-results/junit.xml'
+            junit 'jest-results/junit.xml'
         }
     }
 }
