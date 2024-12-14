@@ -30,7 +30,6 @@ pipeline {
             steps{
                 sh '''
                     test -f build/index.html    
-                    npx playwright install
                     npx --yes concurrently "npx serve -s build" "npx playwright test"
                 '''
             }
