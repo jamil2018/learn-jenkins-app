@@ -23,14 +23,15 @@ pipeline {
         stage('Test'){
             agent{
                 docker{
-                    image 'node:18-alpine'
+                    image 'mcr.microsoft.com/playwright:v1.49.1-noble'
                     reuseNode true
                 }
             }
             steps{
                 sh '''
                     test -f build/index.html    
-                    npm run test
+                    npx playwright install
+                    npx --yes concurrently "npx serve -s build" "npx playwright test"
                 '''
             }
         }
