@@ -32,6 +32,7 @@ pipeline {
                     test -f build/index.html
                     npm test  
                     npx serve -s build &
+                    sleep 15
                     npx playwright test --reporter=html
                 '''
             }
