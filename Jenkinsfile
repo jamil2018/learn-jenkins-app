@@ -79,6 +79,7 @@ pipeline {
             }
             steps{
                 sh '''
+                    npm i netlify-cli
                     npx netlify-cli --version
                     echo "Deploying to prod. Site id: $NETLIFY_SITE_ID"
                     npx netlify-cli status
