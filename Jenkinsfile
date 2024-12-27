@@ -84,8 +84,29 @@ pipeline {
                     echo "Deploying to prod. Site id: $NETLIFY_SITE_ID"
                     npx netlify-cli status
                     npx netlify-cli deploy --dir=build --prod
-                    echo "small change"
                 '''
+            }
+        }
+
+        stage('Prod E2E Test'){
+            agent{
+                docker{
+                    image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
+                    reuseNode true
+                }
+            }
+            environment{
+                CI_ENVIRONMENT_URL = 'https://spontaneous-bombolone-b271df.netlify.app'
+            }
+            steps{
+                sh '''
+                    npx playwright test --reporter=html
+                '''
+            }
+            post{
+                always{
+                    publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Playwright E2E Prod HTML Report', reportTitles: '', useWrapperFileDirectly: true])
+                }
             }
         }
     }
