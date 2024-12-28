@@ -124,9 +124,12 @@ pipeline {
         stage('Deploy prod'){
             agent{
                 docker{
-                    image 'node:18-alpine'
+                    image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
                     reuseNode true
                 }
+            }
+             environment{
+                CI_ENVIRONMENT_URL = 'https://spontaneous-bombolone-b271df.netlify.app'
             }
             steps{
                 sh '''
@@ -135,22 +138,7 @@ pipeline {
                     echo "Deploying to prod. Site id: $NETLIFY_SITE_ID"
                     npx netlify-cli status
                     npx netlify-cli deploy --dir=build --prod
-                '''
-            }
-        }
-
-        stage('Prod E2E Test'){
-            agent{
-                docker{
-                    image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
-                    reuseNode true
-                }
-            }
-            environment{
-                CI_ENVIRONMENT_URL = 'https://spontaneous-bombolone-b271df.netlify.app'
-            }
-            steps{
-                sh '''
+                    sleep 15
                     npx playwright test --reporter=html
                 '''
             }
