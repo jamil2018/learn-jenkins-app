@@ -73,9 +73,12 @@ pipeline {
         stage('Deploy staging'){
             agent{
                 docker{
-                    image 'node:18-alpine'
+                    image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
                     reuseNode true
                 }
+            }
+            environment{
+                CI_ENVIRONMENT_URL = "undefined"
             }
             steps{
                 sh '''
@@ -83,25 +86,9 @@ pipeline {
                     npx netlify-cli --version
                     echo "Deploying to prod. Site id: $NETLIFY_SITE_ID"
                     npx netlify-cli status
-                    npx netlify-cli deploy --dir=build --json > netlify-deploy-info.json 
-                '''
-                script{
-                    env.STAGING_URL = sh(script: "npx node-jq -r '.deploy_url' netlify-deploy-info.json", returnStdout: true)
-                }
-            }
-        }
-        stage('Staging E2E Test'){
-            agent{
-                docker{
-                    image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
-                    reuseNode true
-                }
-            }
-            environment{
-                CI_ENVIRONMENT_URL = "${env.STAGING_URL}"
-            }
-            steps{
-                sh '''
+                    npx netlify-cli deploy --dir=build --json > netlify-deploy-info.json
+                    CI_ENVIRONMENT_URL = $(npx node-jq -r '.deploy_url' netlify-deploy-info.json)
+                    sleep 15
                     npx playwright test --reporter=html
                 '''
             }
@@ -111,6 +98,7 @@ pipeline {
                 }
             }
         }
+
         stage('Approval'){
             agent any
 
