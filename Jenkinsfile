@@ -128,7 +128,7 @@ pipeline {
                     reuseNode true
                 }
             }
-             environment{
+            environment{
                 CI_ENVIRONMENT_URL = 'https://spontaneous-bombolone-b271df.netlify.app'
             }
             steps{
